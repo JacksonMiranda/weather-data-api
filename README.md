@@ -24,8 +24,8 @@ Siga os passos abaixo para configurar e executar o projeto localmente.
 
 **1. Clone o Repositório**
 ```bash
-git clone [URL_DO_SEU_REPOSITORIO_AQUI]
-cd [NOME_DA_PASTA_DO_PROJETO]
+git clone [https://github.com/JacksonMiranda/weather-data-api]
+cd [cadastro-dev-app]
 ```
 
 **2. Configure as Variáveis de Ambiente**
