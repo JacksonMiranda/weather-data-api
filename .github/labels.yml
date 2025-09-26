@@ -1,0 +1,46 @@
+# GitHub Labels Configuration
+# This file defines standardized labels for the repository
+
+- name: bug
+  color: d73a4a
+  description: "Relatar um problema"
+
+- name: feature
+  color: a2eeef
+  description: "Nova funcionalidade"
+
+- name: chore
+  color: d4c5f9
+  description: "Tarefas de manutenção"
+
+- name: docs
+  color: 0075ca
+  description: "Documentação"
+
+- name: perf
+  color: cfd3d7
+  description: "Performance"
+
+- name: refactor
+  color: efefef
+  description: "Refatoração"
+
+- name: test
+  color: e4e669
+  description: "Testes"
+
+- name: ci
+  color: BFD4F2
+  description: "Integração contínua"
+
+- name: security
+  color: B60205
+  description: "Segurança"
+
+- name: help wanted
+  color: "008672"
+  description: "Ajuda bem-vinda"
+
+- name: good first issue
+  color: 7057ff
+  description: "Boa primeira contribuição"
