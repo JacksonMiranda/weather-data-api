@@ -1,0 +1,23 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Environment files should be filtered to avoid accidental commits of secrets
+.env filter=git-crypt diff=git-crypt
+
+# Linguist hints for proper language detection
+*.js linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.json linguist-language=JSON
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+*.md linguist-language=Markdown
+Dockerfile* linguist-language=Dockerfile
+docker-compose*.yml linguist-language=YAML
+
+# Mark documentation and configuration files
+*.md linguist-documentation
+*.txt linguist-documentation
+LICENSE linguist-documentation
+CHANGELOG* linguist-documentation
+docs/ linguist-documentation
+.github/ linguist-documentation

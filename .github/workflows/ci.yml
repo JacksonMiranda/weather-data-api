@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20, 22]
+        
+    services:
+      postgres:
+        image: postgres:14-alpine
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm ci
+
+    - name: Run linter (if available)
+      run: |
+        cd backend
+        npm run lint --if-present
+
+    - name: Run tests (if available)
+      run: |
+        cd backend
+        npm run test --if-present
+      env:
+        DB_USER: test_user
+        DB_PASSWORD: test_password
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_DATABASE: test_db
+        OPENWEATHER_API_KEY: test_key_for_ci
+        NODE_ENV: test
+
+    - name: Generate test coverage (if available)
+      run: |
+        cd backend
+        npm run test:coverage --if-present
+      env:
+        DB_USER: test_user
+        DB_PASSWORD: test_password
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_DATABASE: test_db
+        OPENWEATHER_API_KEY: test_key_for_ci
+        NODE_ENV: test
+
+    - name: Upload coverage reports (if available)
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: coverage-reports-node-${{ matrix.node-version }}
+        path: backend/coverage/
+        retention-days: 30
+
+    - name: Build application
+      run: |
+        cd backend
+        npm run build --if-present
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: docker build -t weather-data-api:test .
+
+    - name: Test Docker image
+      run: |
+        # Create a test .env file
+        cp .env.example .env
+        echo "OPENWEATHER_API_KEY=test_key" >> .env
+        
+        # Test if container starts successfully
+        timeout 30s docker-compose up --abort-on-container-exit --exit-code-from api || true

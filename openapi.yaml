@@ -1,0 +1,171 @@
+openapi: 3.0.0
+info:
+  title: Weather Data API
+  description: |
+    API para buscar dados climáticos da OpenWeather, armazenar em um banco de dados e permitir a consulta.
+    
+    API to fetch weather data from OpenWeather, store in a database and allow querying.
+  version: 1.0.0
+  contact:
+    name: Jackson Miranda
+    email: jacksonmiranda.dev@gmail.com
+    url: https://github.com/JacksonMiranda
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001
+    description: Development server
+  - url: https://weather-data-api.herokuapp.com
+    description: Production server (example)
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API
+      tags:
+        - Health
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: "2025-01-01T12:00:00Z"
+                  version:
+                    type: string
+                    example: "1.0.0"
+
+  /weather/{city}:
+    post:
+      summary: Busca e armazena dados climáticos de uma cidade
+      description: |
+        Busca dados climáticos da API OpenWeather para a cidade especificada e armazena no banco de dados.
+        
+        Fetches weather data from OpenWeather API for the specified city and stores in the database.
+      tags:
+        - Weather
+      parameters:
+        - in: path
+          name: city
+          required: true
+          schema:
+            type: string
+          description: Nome da cidade (City name)
+          example: "Salvador"
+      responses:
+        '201':
+          description: Dados climáticos armazenados com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+        '400':
+          description: Chave da API não configurada ou cidade inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Erro interno do servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /weather:
+    get:
+      summary: Consulta todos os registros de dados climáticos
+      description: |
+        Retorna todos os registros de dados climáticos armazenados no banco de dados, ordenados do mais recente para o mais antigo.
+        
+        Returns all weather data records stored in the database, ordered from newest to oldest.
+      tags:
+        - Weather
+      responses:
+        '200':
+          description: Lista de registros climáticos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherData'
+        '500':
+          description: Erro ao consultar o banco de dados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    WeatherData:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do registro
+          example: 1
+        city:
+          type: string
+          description: Nome da cidade
+          example: "salvador"
+        temperature:
+          type: string
+          description: Temperatura atual em Celsius
+          example: "26.05"
+        feels_like:
+          type: string
+          description: Sensação térmica em Celsius
+          example: "27.01"
+        humidity:
+          type: integer
+          description: Umidade do ar em porcentagem
+          example: 78
+        description:
+          type: string
+          description: Descrição das condições climáticas
+          example: "nuvens dispersas"
+        timestamp:
+          type: string
+          format: date-time
+          description: Data e hora do registro
+          example: "2025-01-01T12:00:00.123Z"
+      required:
+        - id
+        - city
+        - temperature
+        - feels_like
+        - humidity
+        - timestamp
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+          example: "Erro interno do servidor"
+        message:
+          type: string
+          description: Detalhes do erro
+          example: "Chave da API OpenWeather não foi configurada"
+      required:
+        - error
+
+tags:
+  - name: Health
+    description: Endpoints de saúde da API
+  - name: Weather
+    description: Endpoints para manipulação de dados climáticos
