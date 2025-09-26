@@ -36,9 +36,46 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 /**
  * @swagger
  * tags:
+ *   - name: Health
+ *     description: Endpoints de saúde da API
  *   - name: Weather
  *     description: Endpoints para manipulação de dados climáticos
  */
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Returns the health status of the API
+ *     tags:
+ *       - Health
+ *     responses:
+ *       '200':
+ *         description: API is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "ok"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-01-01T12:00:00Z"
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ */
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0'
+    });
+});
 
 /**
  * @swagger
